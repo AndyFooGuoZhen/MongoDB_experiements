@@ -1,24 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import { VStack, Text, Input, Box, Button } from "@chakra-ui/react";
+import axios from "axios";
+import { useState } from "react";
 
 function App() {
+  const [foodName, setFoodName] = useState("");
+  const [daysEaten, setDaysEaten] = useState(0);
+
+  const sendToDatabase = () => {
+    axios.post("http://localhost:3001/insert", {
+      foodName: foodName,
+      days: daysEaten,
+    });
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <VStack w={"100%"} h={"100vh"} justify="center" align={"center"}>
+      <Box w={"70%"} justify="center" align={"center"}>
+        <Text p={"2rem"}> CRUD experiment</Text>
+        <Input
+          p={"2rem"}
+          mb={"2rem"}
+          placeholder="Enter Food Name"
+          onChange={(event) => {
+            setFoodName(event.target.value);
+            console.log(foodName);
+          }}
+        ></Input>
+        <Input
+          p={"2rem"}
+          mb={"2rem"}
+          placeholder="Enter Days eaten Name"
+          onChange={(event) => {
+            setDaysEaten(event.target.value);
+            console.log(daysEaten);
+          }}
+        ></Input>
+        <Button onClick={sendToDatabase}>Post to database</Button>
+      </Box>
+    </VStack>
   );
 }
 

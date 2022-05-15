@@ -1,8 +1,16 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
+const cors = require("cors");
 
 const FoodeModel = require("./models/Food");
+// app.use(
+//   cors({
+//     origin: "http://localhost:3000",
+//   })
+// );
+
+apps.use(cors());
 app.use(express.json()); //receive informtion from frontend using json format
 
 mongoose.connect(
@@ -13,8 +21,13 @@ mongoose.connect(
   }
 );
 
-app.get("/", async (req, res) => {
-  const food = new FoodeModel({ foodName: "Apple", daysSinceIAte: 3 });
+app.post("/insert", async (req, res) => {
+  const foodName = req.body.foodName;
+  const days = req.body.days;
+  console.log(foodName);
+  console.log(days);
+
+  const food = new FoodeModel({ foodName: foodName, daysSinceIAte: days });
 
   try {
     await food.save();
