@@ -1,21 +1,57 @@
-import { VStack, Text, Input, Box, Button } from "@chakra-ui/react";
+import {
+  VStack,
+  Text,
+  Input,
+  Box,
+  Button,
+  GridItem,
+  Grid,
+  SimpleGrid,
+} from "@chakra-ui/react";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
   const [foodName, setFoodName] = useState("");
   const [daysEaten, setDaysEaten] = useState(0);
+  const [foodList, setFoodList] = useState([]);
+  const [newFood, setNewFood] = useState("");
+
+  useEffect(() => {
+    axios.get("http://localhost:3001/read").then((response) => {
+      setFoodList(response.data);
+      console.log(foodList);
+    });
+  }, []);
 
   const sendToDatabase = () => {
-    axios.post("http://localhost:3001/insert", {
-      foodName: foodName,
-      days: daysEaten,
-    });
+    axios
+      .post("http://localhost:3001/insert", {
+        foodName: foodName,
+        days: daysEaten,
+      })
+      .then(() => {
+        setFoodList([
+          ...foodList,
+          { foodName: foodName, daysSinceIAte: daysEaten },
+        ]);
+      });
+  };
+
+  const updateFood = (id) => {
+    console.log(id);
+    axios.put("http://localhost:3001/update", { id: id, newFoodName: newFood });
   };
 
   return (
-    <VStack w={"100%"} h={"100vh"} justify="center" align={"center"}>
-      <Box w={"70%"} justify="center" align={"center"}>
+    <VStack
+      w={"100%"}
+      minH={"100vh"}
+      minW={"400px"}
+      justify="center"
+      align={"center"}
+    >
+      <Box w={"90%"} justify="center" align={"center"}>
         <Text p={"2rem"}> CRUD experiment</Text>
         <Input
           p={"2rem"}
@@ -35,8 +71,41 @@ function App() {
             console.log(daysEaten);
           }}
         ></Input>
-        <Button onClick={sendToDatabase}>Post to database</Button>
+        <Button onClick={sendToDatabase} mb={"2rem"}>
+          Post to database
+        </Button>
       </Box>
+
+      <SimpleGrid w={"80%"} minChildWidth="300px" spacing="40px">
+        {foodList.map((food, key) => {
+          return (
+            <Box
+              key={key}
+              borderRadius="3rem"
+              mb={"2rem"}
+              p="5rem"
+              border="1px"
+              borderColor="gray.300"
+              justifyContent={"center"}
+            >
+              <Text textAlign={"center"} mb={"1rem"}>
+                {food.foodName + " " + food.daysSinceIAte}
+              </Text>
+              <Input
+                placeholder="New Food Name"
+                mb={"1rem"}
+                onChange={(event) => {
+                  setNewFood(event.target.value);
+                }}
+              />
+              <Button mr={"1rem"} onClick={() => updateFood(food._id)}>
+                Update
+              </Button>
+              <Button>Delete</Button>
+            </Box>
+          );
+        })}
+      </SimpleGrid>
     </VStack>
   );
 }
