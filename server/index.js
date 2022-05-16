@@ -40,25 +40,23 @@ app.put("/update", async (req, res) => {
   const newFoodName = req.body.newFoodName;
   const id = req.body.id;
 
-  console.log(id);
-  // fix put request
-
-  FoodModel.find({}, (err, result) => {
-    if (err) {
-      res.send(err);
+  FoodModel.find({ _id: id }, (error, data) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log(data[0].foodName);
+      data[0].foodName = newFoodName;
+      data[0].save();
+      res.send("update");
     }
-    res.send(result);
   });
-  // try {
-  //   await FoodModel.findById(id, (updatedFood) => {
-  //     // updatedFood.foodName = newFoodName;
-  //     console.log(updatedFood);
-  //     // updatedFood.save();
-  //     res.send("update");
-  //   });
-  // } catch (err) {
-  //   console.log(err);
-  // }
+});
+
+app.delete("/delete/:id", async (req, res) => {
+  const id = req.params.id;
+  console.log(id);
+  await FoodModel.findByIdAndRemove(id).exec();
+  res.send("deleted");
 });
 
 app.get("/read", async (req, res) => {

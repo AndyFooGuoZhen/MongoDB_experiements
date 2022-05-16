@@ -41,6 +41,24 @@ function App() {
   const updateFood = (id) => {
     console.log(id);
     axios.put("http://localhost:3001/update", { id: id, newFoodName: newFood });
+
+    setFoodList(
+      foodList.map((food) => {
+        return food._id === id
+          ? { _id: id, foodName: newFood, daysSinceIAte: food.daysSinceIAte }
+          : food;
+      })
+    );
+  };
+
+  const deleteFood = (id) => {
+    axios.delete(`http://localhost:3001/delete/${id}`);
+
+    setFoodList(
+      foodList.filter((food) => {
+        return food._id !== id;
+      })
+    );
   };
 
   return (
@@ -101,7 +119,7 @@ function App() {
               <Button mr={"1rem"} onClick={() => updateFood(food._id)}>
                 Update
               </Button>
-              <Button>Delete</Button>
+              <Button onClick={() => deleteFood(food._id)}>Delete</Button>
             </Box>
           );
         })}
